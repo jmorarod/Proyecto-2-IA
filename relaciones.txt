@@ -1,0 +1,8 @@
+'rel:etymological_origin_of', Dio origen a la palabra de la derecha, es decir es la primera palabra del arbol "genealogico"
+'rel:has_derived_form', La palabra de la izquierda es una forma derivada de la palabra de la derecha
+'rel:is_derived_from', Se deriva de la palabra de la derecha
+'rel:etymology', 
+'rel:etymologically_related', 
+'rel:variant:orthography', 
+'rel:derived', Derivó la palabra de la derecha
+'rel:etymologically'
