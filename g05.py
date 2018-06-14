@@ -1,7 +1,7 @@
 
 import csv
 
-from pyDatalog.pyDatalog import assert_fact, load, ask
+from pyDatalog.pyDatalog import assert_fact, load, ask, clear
 from pyDatalog import pyDatalog, pyEngine
 
 import logging
@@ -15,20 +15,21 @@ class MotorLogico(object):
         self.lan = lan
         self.database = database
         self.one_of_a_kind = one_of_a_kind
-        self.kb.append(Relation("eng", "palabra", "rel:is_derived_from", "deu", "pal"))
-        self.kb.append(Relation("deu", "palabra", "rel:is_derived_from", "deu", "pa"))
-        self.kb.append(Relation("eng", "nagware", "rel:is_derived_from", "eng", "nag"))
-        self.kb.append(Relation("deu", "nagware", "rel:is_derived_from", "eng", "nag"))
-        self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "deu", "hamburger"))
-        self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "eng", "hamburg"))
-        self.kb.append(Relation("eng", "hamburger", "rel:is_derived_from", "eng", "nag"))
-        self.kb.append(Relation("eng", "hamburg", "rel:is_derived_from", "eng", "nag"))
-##        if(self.one_of_a_kind):
-##            self.load_db_equals()
-##        elif(lan == []):
-##            self.load_db()
-##        else:
-##            self.load_db_by_language()
+        #pyDatalog.clear()
+##        self.kb.append(Relation("eng", "palabra", "rel:is_derived_from", "deu", "pal"))
+##        self.kb.append(Relation("deu", "palabra", "rel:is_derived_from", "deu", "pa"))
+##        self.kb.append(Relation("eng", "nagware", "rel:is_derived_from", "eng", "nag"))
+##        self.kb.append(Relation("deu", "nagware", "rel:is_derived_from", "eng", "nag"))
+##        self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "deu", "hamburger"))
+##        self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "eng", "hamburg"))
+##        self.kb.append(Relation("eng", "hamburger", "rel:is_derived_from", "eng", "nag"))
+##        self.kb.append(Relation("eng", "hamburg", "rel:is_derived_from", "eng", "nag"))
+        if(self.one_of_a_kind):
+            self.load_db_equals()
+        elif(lan == []):
+            self.load_db()
+        else:
+            self.load_db_by_language()
 
 
     def relacion_palabra_idioma(self, palabra, idioma):
@@ -48,9 +49,31 @@ class MotorLogico(object):
         return X
     
     def palabras_comun_idiomas(self, idioma1, idioma2):
+        returnList = []
+        X = self.palabras_comun_idiomas_aux(idioma1, idioma2)
+        X = eval(str(X))
+        for i in X:
+            if(i not in returnList):
+                returnList += [i]
+        return returnList
+            
+    def palabras_comun_idiomas_aux(self, idioma1, idioma2):
         X = pyDatalog.Variable()
         Y = pyDatalog.Variable()
-        return Relation.wordInCommon(X,Y,idioma1,idioma2)
+        Z = pyDatalog.Variable()
+        Result = pyDatalog.Variable()
+        Relation.wordInCommon(X,Y,idioma1,idioma2,Z)
+        return Z
+        
+    
+    def contador_palabras_comun_idiomas(self, idioma1, idioma2):
+        X = pyDatalog.Variable()
+        Y = pyDatalog.Variable()
+        Cont = pyDatalog.Variable()
+        Relation.countWordInCommon[X,Y,idioma1,idioma2]==Cont
+        
+        return len(Cont)
+        #return len(self.palabras_comun_idiomas(idioma1, idioma2))
 
     def load_db_by_language(self):
         print("Idioma")
@@ -90,11 +113,11 @@ class MotorLogico(object):
           f_word = row[0][5:]
           
           s_word = row[2][5:]
-          if(f_word not in words):
-              words.append(f_word)
+          if([f_word,f_lan] not in words ):
+              words.append([f_word,f_lan])
               add_to_kb = True
-          if(s_word not in words):
-              words.append(s_word)
+          if([s_word,s_lan] not in words):
+              words.append([s_word,s_lan])
               add_to_kb = True
           if(add_to_kb):
               self.kb.append(Relation(f_lan, f_word, r_type, s_lan, s_word))
@@ -139,23 +162,28 @@ class Relation(pyDatalog.Mixin):
         (Relation.hasLanAndWord[X,Lan,Word]==True) <= (Relation.second_word[X]==Word) & (Relation.second_lan[X]==Lan)
         (Relation.hasLanAndWord[X,Lan,Word]==True) <= (Relation.second_word[X]==Word) &(Relation.first_lan[X]==Lan)
         (Relation.hasLanAndWord[X,Lan,Word]==True) <= (Relation.first_word[X]==Word) & (Relation.second_lan[X]==Lan) 
-        #Palabras comunes entre dos idiomas
-        Relation.wordInCommon(X,Y,Lan1,Lan2) <= (Relation.second_word[X] == Relation.second_word[Y]) & (Relation.second_lan[X]==Lan1) & (Relation.second_lan[Y]==Lan2) & (X!=Y)
-        Relation.wordInCommon(X,Y,Lan1,Lan2) <= (Relation.first_word[X] == Relation.first_word[Y]) & (Relation.first_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2) & (X!=Y)
-        Relation.wordInCommon(X,Y,Lan1,Lan2) <= (Relation.second_word[X] == Relation.first_word[Y]) &  (Relation.second_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2) & (X!=Y)
-        Relation.wordInCommon(X,Y,Lan1,Lan2) <= (Relation.second_word[X] == Relation.first_word[Y]) &  (Relation.second_lan[X]==Lan2) & (Relation.first_lan[Y]==Lan1) & (X!=Y)
+        #Palabras comunes entre dos idiomas(Contar)
+        (Relation.countWordInCommon[X,Y,Lan1,Lan2]==len_(Y)) <= (Relation.second_word[X] == Relation.second_word[Y]) & (Relation.second_lan[X]==Lan1) & (Relation.second_lan[Y]==Lan2) & (X!=Y)
+        (Relation.countWordInCommon[X,Y,Lan1,Lan2]==len_(Y)) <= (Relation.first_word[X] == Relation.first_word[Y]) & (Relation.first_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2) & (X!=Y)
+        (Relation.countWordInCommon[X,Y,Lan1,Lan2]==len_(Y)) <= (Relation.second_word[X] == Relation.first_word[Y]) &  (Relation.second_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2) & (X!=Y)
+        (Relation.countWordInCommon[X,Y,Lan1,Lan2]==len_(Y)) <= (Relation.second_word[X] == Relation.first_word[Y]) &  (Relation.second_lan[X]==Lan2) & (Relation.first_lan[Y]==Lan1) & (X!=Y)
+        #Palabras comunes entre dos idiomas(Listar)
+        Relation.wordInCommon(X,Y,Lan1,Lan2,Z) <= (Relation.second_word[X] == Relation.second_word[Y]) & (Relation.second_lan[X]==Lan1) & (Relation.second_lan[Y]==Lan2) & (X!=Y)& (Relation.second_word[X] == Z) 
+        Relation.wordInCommon(X,Y,Lan1,Lan2,Z) <= (Relation.first_word[X] == Relation.first_word[Y])   & (Relation.first_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2)  & (X!=Y) & (Relation.first_word[X] == Z)
+        Relation.wordInCommon(X,Y,Lan1,Lan2,Z) <= (Relation.second_word[X] == Relation.first_word[Y]) &  (Relation.second_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2)   & (X!=Y) & (Relation.second_word[X] == Z)
+        Relation.wordInCommon(X,Y,Lan1,Lan2,Z) <= (Relation.second_word[X] == Relation.first_word[Y]) &  (Relation.second_lan[X]==Lan2) & (Relation.first_lan[Y]==Lan1)   & (X!=Y) & (Relation.second_word[X] == Z)
         #Relation.wordInCommon(X,Y,Lan1,Lan2) <= (Relation.second_lan[X] != Relation.first_lan[Y]) & (Relation.first_word[X] == Relation.second_word[Y]) & (X!=Y)
 ##        Relation.wordInCommon(X,Y,Lan1,Lan2) <= (Relation.first_word[X] == Z) & (Relation.first_word[Y] == Z)
 ##        Relation.relationHasLanInOne(X,Lan) <= (Relation.first_lan[X] == Lan)
 ##        Relation.relationHasLanInTwo(X,Lan) <= (Relation.second_lan[X] == Lan)
 
-motor = MotorLogico("etymwn.tsv",["rel:etymologically_related"],["afr","eng"], True)
+motor = MotorLogico("etymwn.tsv",[],["pol","deu"], True)
 Y = pyDatalog.Variable()
 X = pyDatalog.Variable()
 Z = pyDatalog.Variable()
 def funcion():
     #motor = MotorLogico("etymwn.tsv",["rel:has_derived_form"],[])
-    return (motor.palabras_comun_idiomas("deu", "eng"))
+    return motor.palabras_comun_idiomas("deu", "pol")
 #print(motor.relacion_hermandad('hamburger','burger'))
 #print(motor.relacion_parent('Hamburg','hamburger'))
 #Y =motor.relacion_parent(X,'hamburger')
