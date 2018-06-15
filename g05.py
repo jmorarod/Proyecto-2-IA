@@ -16,7 +16,14 @@ class MotorLogico(object):
         self.database = database
         self.one_of_a_kind = one_of_a_kind
         #pyDatalog.clear()
+        self.kb.append(Relation("eng", "palabra", "rel:etymology", "eng", "pal"))
+        self.kb.append(Relation("deu", "pala", "rel:etymology", "eng", "pal"))
+        self.kb.append(Relation("deu", "palata", "rel:etymology", "eng", "pal"))
+        self.kb.append(Relation("deu", "pollo", "rel:etymology", "deu", "pal"))
 ##        self.kb.append(Relation("eng", "palabra", "rel:is_derived_from", "deu", "pal"))
+##        self.kb.append(Relation("deu", "pala", "rel:is_derived_from", "eng", "palabra"))
+##        self.kb.append(Relation("deu", "palata", "rel:is_derived_from", "eng", "pala"))
+##        self.kb.append(Relation("deu", "pollo", "rel:is_derived_from", "eng", "palata"))
 ##        self.kb.append(Relation("deu", "palabra", "rel:is_derived_from", "deu", "pa"))
 ##        self.kb.append(Relation("eng", "nagware", "rel:is_derived_from", "eng", "nag"))
 ##        self.kb.append(Relation("deu", "nagware", "rel:is_derived_from", "eng", "nag"))
@@ -24,19 +31,27 @@ class MotorLogico(object):
 ##        self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "eng", "hamburg"))
 ##        self.kb.append(Relation("eng", "hamburger", "rel:is_derived_from", "eng", "nag"))
 ##        self.kb.append(Relation("eng", "hamburg", "rel:is_derived_from", "eng", "nag"))
-        if(self.one_of_a_kind):
-            self.load_db_equals()
-        elif(lan == []):
-            self.load_db()
-        else:
-            self.load_db_by_language()
+##        if(self.one_of_a_kind):
+##            self.load_db_equals()
+##        elif(lan == []):
+##            self.load_db()
+##        else:
+##            self.load_db_by_language()
 
-
+    
     def relacion_palabra_idioma(self, palabra, idioma):
         X = pyDatalog.Variable()
         Relation.hasLanAndWord[X,idioma, palabra]
         return X
 
+    def relacion_ancestro(self, palabra1, palabra2):
+        X=pyDatalog.Variable()
+        Y=pyDatalog.Variable()
+        Z=pyDatalog.Variable()
+        Relation.ancestor(X,Z,palabra2)
+        return Z
+      
+        
     def relacion_hermandad(self, palabra1, palabra2):
         X = pyDatalog.Variable()
         Y = pyDatalog.Variable()
@@ -47,15 +62,18 @@ class MotorLogico(object):
         X = pyDatalog.Variable()
         (Relation.parent(X, palabra1, palabra2))
         return X
+
+    def palabras_originadas(self,palabra,idioma):
+        X = pyDatalog.Variable()
+        Result = pyDatalog.Variable()
+        Relation.originatedWords(X,palabra,idioma,Result)
+        return Result
     
     def palabras_comun_idiomas(self, idioma1, idioma2):
         returnList = []
         X = self.palabras_comun_idiomas_aux(idioma1, idioma2)
-        X = eval(str(X))
-        for i in X:
-            if(i not in returnList):
-                returnList += [i]
-        return returnList
+        X = set(eval(str(X)))
+        return X
             
     def palabras_comun_idiomas_aux(self, idioma1, idioma2):
         X = pyDatalog.Variable()
@@ -151,6 +169,7 @@ class Relation(pyDatalog.Mixin):
         return self.first_lan + ": " + self.first_word + " " + self.r_type + " " + self.second_lan + ": " + self.second_word
     @pyDatalog.program()
     def _():
+        
         #Determinar si dos palabras son hermanas
         Relation.parent(X,Word1,Word2) <=  (Relation.second_word[X]==Word2) & (Relation.first_word[X]==Word1) & (Relation.r_type[X]=='rel:derived')
         Relation.parent(X,Word1,Word2) <= (Relation.second_word[X]==Word2) & (Relation.first_word[X]==Word1) & (Relation.r_type[X]=='rel:has_derived_form')
@@ -162,6 +181,11 @@ class Relation(pyDatalog.Mixin):
         (Relation.hasLanAndWord[X,Lan,Word]==True) <= (Relation.second_word[X]==Word) & (Relation.second_lan[X]==Lan)
         (Relation.hasLanAndWord[X,Lan,Word]==True) <= (Relation.second_word[X]==Word) &(Relation.first_lan[X]==Lan)
         (Relation.hasLanAndWord[X,Lan,Word]==True) <= (Relation.first_word[X]==Word) & (Relation.second_lan[X]==Lan) 
+        #Palabras originadas por otra
+        Relation.originatedWords(X,Word,Lan,Result) <= (Relation.second_word[X]==Word) & (Relation.second_lan[X]==Lan) & (Relation.r_type[X]=='rel:is_derived_from') & ((Relation.first_word[X],Relation.first_lan[X])==Result)
+        Relation.originatedWords(X,Word,Lan,Result) <= (Relation.first_word[X]==Word) & (Relation.first_lan[X]==Lan) & (Relation.r_type[X]=='rel:has_derived_form') & ((Relation.second_word[X],Relation.second_lan[X])==Result)
+        Relation.originatedWords(X,Word,Lan,Result) <= (Relation.second_word[X]==Word) & (Relation.second_lan[X]==Lan) & (Relation.r_type[X]=='rel:etymology') & ((Relation.first_word[X],Relation.first_lan[X])==Result)
+        Relation.originatedWords(X,Word,Lan,Result) <= (Relation.first_word[X]==Word) & (Relation.first_lan[X]==Lan) & (Relation.r_type[X]=='rel:etymological_origin_of') & ((Relation.second_word[X],Relation.second_lan[X])==Result)
         #Palabras comunes entre dos idiomas(Contar)
         (Relation.countWordInCommon[X,Y,Lan1,Lan2]==len_(Y)) <= (Relation.second_word[X] == Relation.second_word[Y]) & (Relation.second_lan[X]==Lan1) & (Relation.second_lan[Y]==Lan2) & (X!=Y)
         (Relation.countWordInCommon[X,Y,Lan1,Lan2]==len_(Y)) <= (Relation.first_word[X] == Relation.first_word[Y]) & (Relation.first_lan[X]==Lan1) & (Relation.first_lan[Y]==Lan2) & (X!=Y)
@@ -183,7 +207,7 @@ X = pyDatalog.Variable()
 Z = pyDatalog.Variable()
 def funcion():
     #motor = MotorLogico("etymwn.tsv",["rel:has_derived_form"],[])
-    return motor.palabras_comun_idiomas("deu", "pol")
+    return motor.palabras_originadas("pal","eng")
 #print(motor.relacion_hermandad('hamburger','burger'))
 #print(motor.relacion_parent('Hamburg','hamburger'))
 #Y =motor.relacion_parent(X,'hamburger')
