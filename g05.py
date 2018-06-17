@@ -34,16 +34,16 @@ class MotorLogico(object):
         '''
 
         # pyDatalog.clear()
-        self.kb.append(Relation("eng", "palabra",
-                       "rel:etymology", "eng", "pal"))
-        self.kb.append(Relation("deu", "pala", "rel:etymology", "eng", "pal"))
-        self.kb.append(
-            Relation("deu", "palata", "rel:etymology", "eng", "pal"))
-        self.kb.append(Relation("deu", "pollo", "rel:etymology", "deu", "pal"))
-        self.kb.append(
-            Relation("deu", "polloo", "rel:etymology", "deu", "palabra"))
-        self.kb.append(Relation("eng", "palabra",
-                       "rel:is_derived_from", "sco", "pal"))
+##        self.kb.append(Relation("eng", "palabra",
+##                       "rel:etymology", "eng", "pal"))
+##        self.kb.append(Relation("deu", "pala", "rel:etymology", "eng", "pal"))
+##        self.kb.append(
+##            Relation("deu", "palata", "rel:etymology", "eng", "pal"))
+##        self.kb.append(Relation("deu", "pollo", "rel:etymology", "deu", "pal"))
+##        self.kb.append(
+##            Relation("deu", "polloo", "rel:etymology", "deu", "palabra"))
+##        self.kb.append(Relation("eng", "palabra",
+##                       "rel:is_derived_from", "sco", "pal"))
 # self.kb.append(Relation("deu", "pala", "rel:is_derived_from", "eng", "palabra"))
 # self.kb.append(Relation("deu", "palata", "rel:is_derived_from", "eng", "pala"))
 # self.kb.append(Relation("deu", "pollo", "rel:is_derived_from", "eng", "palata"))
@@ -121,7 +121,7 @@ class MotorLogico(object):
         X = pyDatalog.Variable()
         Result = pyDatalog.Variable()
         Relation.originatedWords(X,palabra,idioma,Result)
-        return Result
+        return X,Result
 
     def idiomas_relacionados_palabra(self, palabra):
         X = pyDatalog.Variable()
@@ -146,8 +146,8 @@ class MotorLogico(object):
 
 
     def contador_palabras_comun_idiomas(self, idioma1, idioma2):
-
-        return len(self.palabras_comun_idiomas_aux(idioma1, idioma2)[1])
+        inferencias, resultado = self.palabras_comun_idiomas_aux(idioma1, idioma2)
+        return len(resultado)
 
 
     def mayor_aporte_a_idioma(self,idioma,test=False):
@@ -155,7 +155,7 @@ class MotorLogico(object):
         Result = pyDatalog.Variable()
         pyDatalog.create_terms("max_index")
         print(max_index(porcentajes)==Result)
-        return idiomas[int(str(Result.v()))],porcentajes.data[0][int(str(Result.v()))]
+        return inferencias, idiomas[int(str(Result.v()))],porcentajes.data[0][int(str(Result.v()))]
     
     #Retorna las inferencias, la lista de idiomas que aportaron y el porcentaje de cada una respectivamente
     def aporte_idiomas(self,idioma,test=False):
