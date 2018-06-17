@@ -150,28 +150,48 @@ class MotorLogico(object):
         return len(self.palabras_comun_idiomas_aux(idioma1, idioma2)[1])
 
 
-    def aporte_idiomas(self,idioma):
-        if(self.lan == []):
-            return self.aporte_idiomas_aux(idioma,self.get_idiomas_file)
-        else:
-            return self.aporte_idiomas_aux(idioma,self.lan)
-
-    def aporte_idiomas_aux(self,idioma,idiomas):
-        X = pyDatalog.Variable()
+    def mayor_aporte_a_idioma(self,idioma,test=False):
+        inferencias, idiomas, porcentajes = self.aporte_idiomas(idioma,test)
         Result = pyDatalog.Variable()
-        inferences=[]
-        percentages=[]
-        total = 0
-        for i in idiomas:
-            if(i!=idioma):
-                inferences += [Relation.proportionPerLan(X,idioma,i)]#hacer que si devolvió algo entonces agregar i a results
-                # if(len(Result)>0):
-                    # results+=[[lan,Result]]
-                    # total += len(Result)
-                    # percentages+=[len(Result)]
-        # percentages = self.lista_porcentaje(percentages,total)
-        # return results,percentages
-        return results
+        pyDatalog.create_terms("max_index")
+        print(max_index(porcentajes)==Result)
+        return idiomas[int(str(Result.v()))],porcentajes.data[0][int(str(Result.v()))]
+    
+    #Retorna las inferencias, la lista de idiomas que aportaron y el porcentaje de cada una respectivamente
+    def aporte_idiomas(self,idioma,test=False):
+        if(self.lan == []):
+            return self.aporte_idiomas_aux(idioma,self.get_idiomas_file(),test)
+        else:
+            return self.aporte_idiomas_aux(idioma,self.lan,test)
+        
+    def aporte_idiomas_aux(self,idioma,idiomas,test=False):
+       X = pyDatalog.Variable()
+       Result = pyDatalog.Variable()
+       Porcentajes = pyDatalog.Variable()
+       lan_kb = []
+       inferences=[]
+       idiomas_lista=[]
+       percentages=[]
+       total = 0
+       pyDatalog.create_terms('lista_vacia')
+       pyDatalog.create_terms('lista_porcentaje')
+       
+       
+       for i in idiomas:
+           if(i!=idioma):
+               if(not test):
+                   self.kb = []
+                   self.lan = [i]
+                   self.load_db_by_language()
+               
+               (lista_vacia(Relation.proportionPerLan(X,idioma,i))==Result)
+               if(not Result.v()):
+                   inferences += [Relation.proportionPerLan(X,idioma,i)]
+                   idiomas_lista += [i]
+                   total += len(Relation.proportionPerLan(X,idioma,i))
+                   percentages += [len(Relation.proportionPerLan(X,idioma,i))]
+       (lista_porcentaje(percentages,total)==Porcentajes)
+       return inferences,idiomas_lista,Porcentajes
 
 
 
@@ -328,10 +348,30 @@ class Relation(pyDatalog.Mixin):
         Relation.proportionPerLan(X,BaseLan,GLan) <= (Relation.first_lan[X]==BaseLan) & (Relation.second_lan[X]==GLan) & (Relation.r_type[X]=='rel:is_derived_from')
         Relation.proportionPerLan(X,BaseLan,GLan) <= (Relation.second_lan[X]==GLan) & (Relation.first_lan[X]==BaseLan) & (Relation.r_type[X]=='rel:derived')
 
+
+#Funciones para usar en expresiones logicas
+
+def lista_vacia(lista):
+        if(lista==[]):
+            return True
+        return False
+    
+def lista_porcentaje(lista,total):
+        for i in range(len(lista)):
+            lista[i] /= total
+        return lista
+    
+def max_index(lista):
+    max_value = 0
+    max_index = 0
+    for i in range(len(lista)):
+        if(lista.data[0][i]>max_value):
+            max_value = lista[i]
+            max_index = i
+    return max_index
+
 motor = MotorLogico("etymwn.tsv",[],["eng","deu","sco"])
-Y = pyDatalog.Variable()
-X = pyDatalog.Variable()
-Z = pyDatalog.Variable()
+
 def funcion():
     # motor = MotorLogico("etymwn.tsv",["rel:has_derived_form"],[])
     # return (motor.relacion_primos_nivel("h","j"))
