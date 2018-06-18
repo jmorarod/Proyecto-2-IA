@@ -16,44 +16,6 @@ class MotorLogico(object):
         self.lan = lan
         self.database = database
 
-
-'''  Base de datos para probar paresteco
-
-        self.kb.append(Relation("eng","a","rel:is_derived_from","eng","x"))
-        self.kb.append(Relation("eng","b","rel:is_derived_from","eng","a"))
-        self.kb.append(Relation("eng","c","rel:is_derived_from","eng","a"))
-        self.kb.append(Relation("eng","d","rel:is_derived_from","eng","b"))
-        self.kb.append(Relation("eng","e","rel:is_derived_from","eng","b"))
-        self.kb.append(Relation("eng","f","rel:is_derived_from","eng","c"))
-        self.kb.append(Relation("eng","g","rel:is_derived_from","eng","c"))
-        self.kb.append(Relation("eng","h","rel:is_derived_from","eng","d"))
-        self.kb.append(Relation("eng","i","rel:is_derived_from","eng","d"))
-        self.kb.append(Relation("eng","j","rel:is_derived_from","eng","f"))
-        self.kb.append(Relation("eng","k","rel:is_derived_from","eng","f"))
-
-        '''
-
-        # pyDatalog.clear()
-##        self.kb.append(Relation("eng", "palabra",
-##                       "rel:etymology", "eng", "pal"))
-##        self.kb.append(Relation("deu", "pala", "rel:etymology", "eng", "pal"))
-##        self.kb.append(
-##            Relation("deu", "palata", "rel:etymology", "eng", "pal"))
-##        self.kb.append(Relation("deu", "pollo", "rel:etymology", "deu", "pal"))
-##        self.kb.append(
-##            Relation("deu", "polloo", "rel:etymology", "deu", "palabra"))
-##        self.kb.append(Relation("eng", "palabra",
-##                       "rel:is_derived_from", "sco", "pal"))
-# self.kb.append(Relation("deu", "pala", "rel:is_derived_from", "eng", "palabra"))
-# self.kb.append(Relation("deu", "palata", "rel:is_derived_from", "eng", "pala"))
-# self.kb.append(Relation("deu", "pollo", "rel:is_derived_from", "eng", "palata"))
-# self.kb.append(Relation("deu", "palabra", "rel:is_derived_from", "deu", "pa"))
-# self.kb.append(Relation("eng", "nagware", "rel:is_derived_from", "eng", "nag"))
-# self.kb.append(Relation("deu", "nagware", "rel:is_derived_from", "eng", "nag"))
-# self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "deu", "hamburger"))
-# self.kb.append(Relation("eng", "nag", "rel:has_derived_form", "eng", "hamburg"))
-# self.kb.append(Relation("eng", "hamburger", "rel:is_derived_from", "eng", "nag"))
-# self.kb.append(Relation("eng", "hamburg", "rel:is_derived_from", "eng", "nag"))
         try:
             if(load_database):
                 if(lan == []):
@@ -86,7 +48,8 @@ class MotorLogico(object):
         X = pyDatalog.Variable()
         Y = pyDatalog.Variable()
         Z = pyDatalog.Variable()
-        return Relation.cousins(W,X,Y,Z,palabra1,palabra2)
+        (Relation.cousins(W,X,Y,Z,palabra1,palabra2))
+        return Y,Z
 
     def relacion_tio(self, palabra1, palabra2):
         X = pyDatalog.Variable()
@@ -290,11 +253,11 @@ class Relation(pyDatalog.Mixin):
         Relation.parent(X,Word1,Word2) <=  (Relation.second_word[X]==Word2) & (Relation.first_word[X]==Word1) & (Relation.r_type[X]=='rel:derived')
         Relation.parent(X,Word1,Word2) <= (Relation.second_word[X]==Word2) & (Relation.first_word[X]==Word1) & (Relation.r_type[X]=='rel:has_derived_form')
         Relation.parent(X,Word1,Word2) <= (Relation.first_word[X]==Word2) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:is_derived_from')
-        Relation.siblings(X,Y,Word1,Word2) <= Relation.parent(X,Z,Word1) & Relation.parent(Y,Z,Word2)
+        Relation.siblings(X,Y,Word1,Word2) <= Relation.parent(X,Z,Word1) & Relation.parent(Y,Z,Word2) & (X!=Y)
 
         # Determinar si dos palabras son primos primer nivel
-        Relation.cousins(W,X,Y,Z,Word1,Word2) <= Relation.parent(W,A,Word1) & Relation.parent(X,B,Word2) & Relation.siblings(Y,Z,A,B)
-
+        Relation.cousins(W,X,Y,Z,Word1,Word2) <= Relation.parent(W,A,Word1) & Relation.parent(X,B,Word2) & (A!=B) &Relation.siblings(Y,Z,A,B) 
+        
         # Determinar si una palabra es tia de otra
         Relation.uncle(X,Y,Z,Word1,Word2) <= Relation.parent(X,A,Word2) & Relation.siblings(Y,Z,A,Word1)
 
@@ -302,17 +265,11 @@ class Relation(pyDatalog.Mixin):
         Relation.ancestor(X,Word1,Word2) <= (Relation.first_word[X]==Word2) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:is_derived_from')
         Relation.ancestor(X,Word1,Word2) <= (Relation.first_word[X]==Z) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:is_derived_from') & (Relation.ancestor(Y,Z,Word2))
 
-        Relation.ancestor(X,Word1,Word2) <= (Relation.first_word[X]==Word2) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:has_derived_form')
-        Relation.ancestor(X,Word1,Word2) <= (Relation.first_word[X]==Z) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:has_derived_form') & (Relation.ancestor(Y,Z,Word2))
-
-        Relation.ancestor(X,Word1,Word2) <= (Relation.first_word[X]==Word2) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:derived')
-        Relation.ancestor(X,Word1,Word2) <= (Relation.first_word[X]==Z) & (Relation.second_word[X]==Word1) & (Relation.r_type[X]=='rel:derived') & (Relation.ancestor(Y,Z,Word2))
-
         Relation.ances(X,Y,Word1,Word2) <= Relation.ancestor(X,A,Word1) & Relation.ancestor(Y,B,Word2) & (A==B)
 
 
         # Determinas si dos palabras son primos y devolver grado
-        Relation.counsingrade(W,X,Y,Z,Word1,Word2) <= Relation.ancestor(W,A,Word1) & Relation.ancestor(X,B,Word2) & Relation.siblings(Y,Z,A,B)
+        Relation.counsingrade(W,X,Y,Z,Word1,Word2) <= Relation.ancestor(W,A,Word1) & Relation.ancestor(X,B,Word2) & (A!=B) & Relation.siblings(Y,Z,A,B)
 
 
         # Determinar si una palabra esta relacionada con un idioma o no
@@ -373,18 +330,8 @@ def max_index(lista):
 motor = MotorLogico("etymwn.tsv",[],["eng","deu","sco"])
 
 def funcion():
-    # motor = MotorLogico("etymwn.tsv",["rel:has_derived_form"],[])
-    # return (motor.relacion_primos_nivel("h","j"))
     return motor.aporte_idiomas("eng")
-# print(motor.relacion_hermandad('hamburger','burger'))
-# print(motor.relacion_parent('Hamburg','hamburger'))
-# Y =motor.relacion_parent(X,'hamburger')
-# Z = motor.relacion_parent(X,'burger')
-# print(Y)
-# print(Z)
-# print(motor.relacion_palabra_idioma('nag','eng'))
 
 
 
 
-# print(motor.relacion_parent(Y,'hamburger'))
