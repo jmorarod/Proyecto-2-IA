@@ -158,7 +158,7 @@ class MotorLogico(object):
 
 
 
-    def get_idiomas_file():
+    def get_idiomas_file(self):
         try:
             idiomas_file = open("lan.txt","r")
             idiomas = []
