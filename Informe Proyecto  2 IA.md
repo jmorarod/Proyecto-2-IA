@@ -36,10 +36,14 @@ En total hay 6,031,431 relaciones en la base de .
 Las siguientes operaciones fueron implementadas dentro de la aplicación, por cada una se describirá un resultado interesante o bien alguna particularidad de la operación:
 ## Operaciones entre dos palabras
 - **Determinar si dos palabras son heman@s**
-- **Determinar si dos palabras son prim@s**
+La relación de hermanos se usa basándose en la relación de padre. Se verifica que dos palabras tengan un padre en común para que se determinen hermanas. Se realizaron pruebas donde los elementos tuviera múltiples padres y se logro observar que con solo un padre en común confirmaba la relación de hermandad
 - **Determinar si una palabra es hij@ de otra**
+La relación de padre e hijo se manejó tomando en cuenta la relaciones: ' has_derived_form', 'is_derived_from' y 'derived'. Los casos mas interesantes se presentaron cuando una palabra se derivaba de mas de una, en este contexto que tenia mas de un padre. Si se preguntaba por el padre por una de estas palabras el programa daba como respuesta la n cantidad de padres que tuviera. Estos resultados se pudieron visualizar al utilizar un base de datos de ejemplo.
 - **Determinar si una palabra es ti@**
+Los tíos manejan las relaciones de padre e hijo y la de hermandad. En este caso, solo se maneja los tíos a primer nivel. Las pruebas se basaron en tener múltiples hijos, padres, hermanos, pero al ser una relación simple no se observaron  
 - **Determinar si son prim@s y en qué grado**.
+Se manejaron dos relaciones de primos una determinaba los primos a primer nivel y otro a varios niveles. La primera se utiliza la relación padre y hermano y para la segunda se elaboró una relación ancestro la cual era recursiva, también se utiliza una función que determinara la cantidad de ancestros en común y por último la relación de hermandad. Lo interesante de esta relación fue que se podía determinar el grado de primos a pesar de que estuvieran en diferentes niveles de la estructura además se logro visualizar que en la base de datos no se encontraban relaciones de primos con grados muy altos.
+
 ## Operaciones entre palabras e idiomas
 - **Determinar si una palabra está relacionada con un idioma**.
 - **Obtener el conjunto de todas las palabras en un idioma originadas por una palabra
