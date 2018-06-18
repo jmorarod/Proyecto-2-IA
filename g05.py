@@ -110,7 +110,7 @@ class MotorLogico(object):
 
     def contador_palabras_comun_idiomas(self, idioma1, idioma2):
         inferencias, resultado = self.palabras_comun_idiomas_aux(idioma1, idioma2)
-        return len(resultado)
+        return inferencias, len(resultado)
 
 
     def mayor_aporte_a_idioma(self,idioma,test=False):
