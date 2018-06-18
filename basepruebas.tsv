@@ -1,0 +1,11 @@
+eng: a	rel:is_derived_from	eng: x
+eng: b	rel:is_derived_from	eng: a
+eng: c	rel:is_derived_from	eng: a
+eng: d	rel:is_derived_from	eng: b
+eng: e	rel:is_derived_from	eng: b
+eng: h	rel:is_derived_from	eng: d
+eng: i	rel:is_derived_from	eng: d
+eng: f	rel:is_derived_from	eng: c
+eng: g	rel:is_derived_from	eng: c
+eng: j	rel:is_derived_from	eng: g
+eng: k	rel:is_derived_from	eng: g

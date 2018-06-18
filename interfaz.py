@@ -2,7 +2,7 @@ from tkinter import ttk, font, StringVar, Text, HORIZONTAL, END
 from tkinter import filedialog as fd
 import tkinter as tk
 from g05 import *
-
+#from tec.ic.ia.p2.g05 import *
 
 
 class Palabras_Frame(ttk.Frame):
@@ -13,7 +13,7 @@ class Palabras_Frame(ttk.Frame):
         fuente = font.Font(weight='bold')
 
 
-        self.motor = MotorLogico("testDB.tsv",[],[])
+        self.motor = MotorLogico("basepruebas.tsv",[],[])
         self.motor.load_db()
         
         self.etiq1 = ttk.Label(self, text='Palabra 1:',font=fuente)
@@ -205,7 +205,6 @@ class Palabras_Frame(ttk.Frame):
         elif self.radio.get() == "PrimosGrado":
             resultado_primos = self.motor.relacion_primos_nivel(self.palabra1.get(), self.palabra2.get())
             resultado_list = str(resultado_primos[0].data)
-            print(resultado_list)
             
             if len(resultado_primos) > 0:
                 self.salida_operacion.insert("1.0", "grado: "+str(resultado_primos[1]))
@@ -229,6 +228,8 @@ class Palabras_Frame(ttk.Frame):
         
         archivo = fd.askopenfilename()
         self.motor.database = archivo
+        self.motor.kb = []
+        self.motor.load_db()
         print(self.motor.database)
         
 
@@ -239,7 +240,7 @@ class Idiomas_Idiomas_Frame(ttk.Frame):
         
         fuente = font.Font(weight='bold')
 
-        self.motor = MotorLogico("testDB.tsv",[],[])
+        self.motor = MotorLogico("basepruebas.tsv",[],[])
         self.motor.load_db()
         
 
@@ -366,6 +367,8 @@ class Idiomas_Idiomas_Frame(ttk.Frame):
 
         self.motor.valid_relations = relaciones_limpio
         self.motor.load_db()
+        
+        
         print(self.motor.valid_relations)
         
 
@@ -405,7 +408,7 @@ class Idiomas_Idiomas_Frame(ttk.Frame):
             
             print("ListarPalabras")
         elif self.radio.get() == "IdiomaAporte":
-            resultado = self.motor.mayor_aporte_a_idioma(self.palabra1.get(), True)
+            resultado = self.motor.mayor_aporte_a_idioma(self.palabra1.get(), False)
             resultado_list = str(resultado)
             if len(resultado[0]) > 0:
                 self.salida_operacion.insert("1.0", "Inferencias: \n"+str(resultado[0]))
@@ -425,7 +428,7 @@ class Idiomas_Idiomas_Frame(ttk.Frame):
             
             print("IdiomaAporte")
         elif self.radio.get() == "IdiomasAporte":
-            resultado = self.motor.aporte_idiomas(self.palabra1.get(), True)
+            resultado = self.motor.aporte_idiomas(self.palabra1.get(), False)
             resultado_list = str(resultado)
             if len(resultado[0]) > 0:
                 self.salida_operacion.insert("1.0", "Inferencias: \n"+str(resultado[0]))
@@ -448,6 +451,8 @@ class Idiomas_Idiomas_Frame(ttk.Frame):
     def abrir_archivo(self):
         archivo = fd.askopenfilename()
         self.motor.database = archivo
+        self.motor.load_db()
+        
         print(self.motor.database)
         
 
@@ -458,7 +463,7 @@ class Palabras_Idiomas_Frame(ttk.Frame):
         
         fuente = font.Font(weight='bold')
 
-        self.motor = MotorLogico("testDB.tsv",[],[])
+        self.motor = MotorLogico("basepruebas.tsv",[],[])
         self.motor.load_db()
         print(self.motor.database)
         

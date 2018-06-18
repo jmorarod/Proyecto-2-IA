@@ -1,0 +1,5 @@
+eng: a	rel:is_derived_from	eng: x
+eng: a	rel:is_derived_from	eng: d
+eng: c	rel:is_derived_from	eng: a
+eng: b	rel:is_derived_from	eng: a
+eng: e	rel:is_derived_from	eng: a

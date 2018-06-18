@@ -1,1 +1,7 @@
-{}
+{
+  "tec/ic/ia/p2/test_g05.py": true,
+  "test_g05.py::test_primos_diferentes_nivel_true": true,
+  "test_g05.py::test_primos_mismo_nivel_true": true,
+  "test_g05.py::test_primos_nivel_false": true,
+  "test_g05.py::test_primos_primer_nivel_false": true
+}

@@ -40,6 +40,17 @@ dan: fil	rel:has_derived_form	dan: filens
 dan: fil	rel:has_derived_form	dan: filerne
 dan: fil	rel:has_derived_form	dan: filernes
 dan: fil	rel:is_derived_from	dan: file
+eng: a	rel:is_derived_from	eng: x
+eng: b	rel:is_derived_from	eng: a
+eng: c	rel:is_derived_from	eng: a
+eng: d	rel:is_derived_from	eng: b
+eng: e	rel:is_derived_from	eng: b
+eng: h	rel:is_derived_from	eng: d
+eng: i	rel:is_derived_from	eng: d
+eng: f	rel:is_derived_from	eng: c
+eng: g	rel:is_derived_from	eng: c
+eng: j	rel:is_derived_from	eng: g
+eng: k	rel:is_derived_from	eng: g
 eng: bat	rel:is_derived_from	eng: battastic
 eng: battastic	rel:has_derived_form	eng: bat
 eng: batmobile	rel:is_derived_from	eng: bat
