@@ -332,7 +332,7 @@ def test_contador_palabras_comun():
 
     resultado = motor.contador_palabras_comun_idiomas("eng","deu")
 
-    assert resultado == 4
+    assert resultado[1] == 4 
 
 def test_palabras_comun_idiomas():
     motor =  MotorLogico("etymwn.tsv", [] , [], False)
