@@ -14,7 +14,7 @@ class MotorLogico(object):
         self.valid_relations = valid_relations
         self.kb = []
         self.lan = lan
-        self.database = database
+        self.database = database     
 
         try:
             if(load_database):
@@ -95,9 +95,9 @@ class MotorLogico(object):
 
     def palabras_comun_idiomas(self, idioma1, idioma2):
         returnList = []
-        X = self.palabras_comun_idiomas_aux(idioma1, idioma2)
-        X = set(eval(str(X)))
-        return X
+        X,Result = self.palabras_comun_idiomas_aux(idioma1, idioma2)
+        Result = set(eval(str(Result)))
+        return X,Result
 
     def palabras_comun_idiomas_aux(self, idioma1, idioma2):
         X = pyDatalog.Variable()
@@ -327,10 +327,10 @@ def max_index(lista):
             max_index = i
     return max_index
 
-motor = MotorLogico("etymwn.tsv",[],["eng","deu","sco"])
+motor = MotorLogico("etymwn.tsv",[],["eng","deu","fro"])
 
 def funcion():
-    return motor.aporte_idiomas("eng")
+    return motor.aporte_idiomas("eng",True)
 
 
 
